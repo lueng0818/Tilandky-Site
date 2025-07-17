@@ -1,0 +1,5 @@
+streamlit
+markdown
+mailchimp-marketing
+python-dotenv
+Pillow
