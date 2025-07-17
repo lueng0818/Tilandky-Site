@@ -94,11 +94,18 @@ else:
     
     # 顯示
     st.header(meta["title"])
-    for img in meta["images"]:
+
+# 圖片橫向滑動顯示（類似 IG Carousel）
+images = meta.get("images", [])
+if images:
+    # 建構一個可左右滑動的容器
+    html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
+    for img in images:
         img_path = os.path.join(IMAGE_DIR, img)
-        if os.path.exists(img_path):
-            st.image(Image.open(img_path), use_container_width=True)
-    st.markdown(markdown.markdown(body), unsafe_allow_html=True)
+        # Streamlit 允許用相對路徑直接做 <img> 標籤
+        html += f"<img src='{img_path}' style='height:300px; flex-shrink:0; border-radius:8px;'/>"
+    html += "</div>"
+    st.markdown(html, unsafe_allow_html=True)
     
     # 編輯與刪除按鈕
     col1, col2 = st.columns(2)
