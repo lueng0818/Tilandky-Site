@@ -1,4 +1,7 @@
+## views/about.py
+```python
 import streamlit as st
+
 
 def show():
     st.title("關於我")
