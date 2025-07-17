@@ -1,7 +1,7 @@
 ## views/resources.py
 ```python
 import streamlit as st
-from utils.mailchimp import subscribe_email
+from mailchimp import subscribe_email
 
 
 def show():
