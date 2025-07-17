@@ -155,10 +155,7 @@ elif page == "部落格":
         ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True),
         key="choice_selectbox"
     )
-    
-    st.title("日常探索部落格")
-    tpl = st.sidebar.selectbox("載入 SEO 範本", ["— 無 —"] + list(TEMPLATES.keys()))
-    choice = st.sidebar.selectbox("文章列表", ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True))
+
     # 新增文章
     if choice == "── 新增文章 ──":
         with st.sidebar.form("new"):
