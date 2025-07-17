@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from PIL import Image
 import markdown
+import shutil
 
 # 目錄設定
 CONTENT_DIR = os.path.join("content", "blog_posts")
@@ -17,65 +18,130 @@ def slugify(text):
     s = re.sub(r"[\s-]+", "-", s).strip("-")
     return s
 
-# =========================
-# 側邊欄：貼文表單
-# =========================
-st.sidebar.header("撰寫新文章")
-with st.sidebar.form("new_post"):
-    title = st.text_input("標題")
-    content = st.text_area("內文")
-    # 接受多張檔案
-    images = st.file_uploader("上傳圖片 (可多選)", type=["png","jpg","jpeg"], accept_multiple_files=True)
-    submit = st.form_submit_button("發布")
+def parse_frontmatter(path):
+    """讀取 markdown 前置欄，回傳 dict 包含 title, date, images(list)"""
+    meta = {"title": "", "date": "", "images": []}
+    lines = open(path, encoding="utf-8").read().splitlines()
+    in_meta = False
+    for line in lines:
+        if line.strip() == "---":
+            if not in_meta:
+                in_meta = True
+            else:
+                break
+        elif in_meta and ":" in line:
+            key, val = line.split(":", 1)
+            key = key.strip()
+            val = val.strip()
+            if key in ["title", "date"]:
+                meta[key] = val
+            elif key == "images":
+                try:
+                    meta["images"] = eval(val)
+                except:
+                    meta["images"] = []
+    return meta
 
-if submit and title and content:
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    slug = slugify(title)
-    # 儲存所有上傳圖片
-    saved_images = []
-    for img in images:
-        ext = os.path.splitext(img.name)[1]
-        fname = f"{slug}-{len(saved_images)+1}{ext}"
-        path = os.path.join(IMAGE_DIR, fname)
-        with open(path, "wb") as f:
-            f.write(img.getbuffer())
-        saved_images.append(fname)
-    # 建立 Markdown 檔，不再放 image 欄，而是純文字
-    md_name = f"{date_str}-{slug}.md"
-    md_path = os.path.join(CONTENT_DIR, md_name)
-    with open(md_path, "w", encoding="utf-8") as f:
-        f.write(f"---\ntitle: {title}\ndate: {date_str}\nimages: {saved_images}\n---\n\n")
-        f.write(content)
-    st.sidebar.success("文章已發布！重新整理列表。")
-
-# =========================
-# 主區：顯示文章
-# =========================
-st.title("日常探索部落格")
-# 取出所有 .md
+# 列出所有文章，並用「日期 + 標題」做成選單
 posts = sorted([fn for fn in os.listdir(CONTENT_DIR) if fn.endswith(".md")], reverse=True)
-sel = st.selectbox("選擇文章", posts)
+labels = []
+map_label_to_file = {}
+for fn in posts:
+    meta = parse_frontmatter(os.path.join(CONTENT_DIR, fn))
+    label = f"{meta['date']} － {meta['title']}"
+    labels.append(label)
+    map_label_to_file[label] = fn
 
-if sel:
-    md_path = os.path.join(CONTENT_DIR, sel)
-    text = open(md_path, encoding="utf-8").read().splitlines()
-    # 先解析 frontmatter，找出 images 欄位
-    images_line = next((line for line in text if line.startswith("images:")), "")
-    img_list = []
-    if images_line:
-        # 將 Python-list 字串轉回 list
-        try:
-            img_list = eval(images_line.split("images:")[1].strip())
-        except:
-            img_list = []
-    # 顯示標題與日期
-    #   也可在 frontmatter 中解析 title/date
-    # 顯示每張圖片
-    for img_fname in img_list:
-        img_path = os.path.join(IMAGE_DIR, img_fname)
+st.title("日常探索部落格")
+choice = st.selectbox("選擇文章", ["── 新增文章 ──"] + labels)
+
+# ***** 新增文章 *****
+if choice == "── 新增文章 ──":
+    st.header("新增文章")
+    with st.form("new_post"):
+        title = st.text_input("標題")
+        content = st.text_area("內文")
+        images = st.file_uploader("上傳圖片 (可多選)", type=["png","jpg","jpeg"], accept_multiple_files=True)
+        if st.form_submit_button("發布"):
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            fn_slug = slugify(title)
+            # 儲存圖片
+            saved = []
+            for i, img in enumerate(images, start=1):
+                ext = os.path.splitext(img.name)[1]
+                fname = f"{fn_slug}-{i}{ext}"
+                with open(os.path.join(IMAGE_DIR, fname), "wb") as f:
+                    f.write(img.getbuffer())
+                saved.append(fname)
+            # 寫 markdown
+            md_name = f"{date_str}-{fn_slug}.md"
+            md_path = os.path.join(CONTENT_DIR, md_name)
+            with open(md_path, "w", encoding="utf-8") as f:
+                f.write(f"---\n")
+                f.write(f"title: {title}\n")
+                f.write(f"date: {date_str}\n")
+                f.write(f"images: {saved}\n")
+                f.write(f"---\n\n")
+                f.write(content)
+            st.success("文章已新增！請重新整理以查看。")
+
+# ***** 選擇文章後：顯示、編輯、刪除 *****
+else:
+    fn = map_label_to_file[choice]
+    path = os.path.join(CONTENT_DIR, fn)
+    meta = parse_frontmatter(path)
+    body = "\n".join(open(path, encoding="utf-8").read().split("---")[2:]).strip()
+    
+    # 顯示
+    st.header(meta["title"])
+    for img in meta["images"]:
+        img_path = os.path.join(IMAGE_DIR, img)
         if os.path.exists(img_path):
             st.image(Image.open(img_path), use_container_width=True)
-    # 剩餘的 Markdown 內容，用 markdown 套件轉 HTML
-    # 跳過前三行 frontmatter
-    body = "\n".join(text[text.index("")+1:]) if "" in text else "\n".join(text)
     st.markdown(markdown.markdown(body), unsafe_allow_html=True)
+    
+    # 編輯與刪除按鈕
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✏️ 編輯文章"):
+            st.session_state.edit_mode = True
+    with col2:
+        if st.button("🗑️ 刪除文章"):
+            # 刪除 markdown
+            os.remove(path)
+            # 刪除對應圖片
+            for img in meta["images"]:
+                p = os.path.join(IMAGE_DIR, img)
+                if os.path.exists(p):
+                    os.remove(p)
+            st.success("文章已刪除！請重新整理。")
+            st.experimental_rerun()
+    
+    # 編輯模式
+    if st.session_state.get("edit_mode", False):
+        st.subheader("編輯文章")
+        with st.form("edit_post"):
+            new_title = st.text_input("標題", meta["title"])
+            new_body = st.text_area("內文", body)
+            new_images = st.file_uploader("新增圖片 (可多選)", type=["png","jpg","jpeg"], accept_multiple_files=True)
+            if st.form_submit_button("儲存修改"):
+                # 新增圖片至列表
+                saved = meta["images"][:]
+                for i, img in enumerate(new_images, start=len(saved)+1):
+                    ext = os.path.splitext(img.name)[1]
+                    fname = f"{slugify(meta['title'])}-{i}{ext}"
+                    with open(os.path.join(IMAGE_DIR, fname), "wb") as f:
+                        f.write(img.getbuffer())
+                    saved.append(fname)
+                # 重寫 markdown (保留舊圖片，也可自行改成整組替換)
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(f"---\n")
+                    f.write(f"title: {new_title}\n")
+                    f.write(f"date: {meta['date']}\n")
+                    f.write(f"images: {saved}\n")
+                    f.write(f"---\n\n")
+                    f.write(new_body)
+                st.success("文章已更新！")
+                # 離開編輯模式並重新整理
+                st.session_state.edit_mode = False
+                st.experimental_rerun()
