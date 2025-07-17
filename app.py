@@ -4,7 +4,6 @@ from utils.mailchimp import subscribe_email
 from PIL import Image
 import os
 
-# 設定網頁標題與版面配置
 st.set_page_config(
     page_title="Tilandky的覺察日常",
     layout="wide",
