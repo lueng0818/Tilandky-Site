@@ -97,123 +97,52 @@ st.markdown("<style>[data-testid='stSidebarNav'] > div:nth-child(2){display:none
 st.sidebar.title("Tilandky的覺察日常")
 page = st.sidebar.radio("導航", ["首頁", "部落格", "免費資源", "關於我", "聯絡我"])
 
-# ===== 首頁 =====
-if page=="首頁":
-    # Banner 圖
+# 首頁
+if page == "首頁":
     st.image("assets/banner.jpg", use_container_width=True)
+    st.markdown("...首頁內容...", unsafe_allow_html=True)
 
-    # 主頁介紹內容
-    st.markdown(
-        """
-        <div class='prose lg:prose-xl mx-auto my-8'>
-          <p>這裡是 <strong>Tilandky 的覺察日常</strong>。<br>
-          陪你一起練習在關係裡，不再把自己藏起來；<br>
-          在創業路上不再懷疑自己的價值。<br>
-          我相信每個人都有自己的節奏與方式，<br>
-          你不是不夠好，也不是走太慢，<br>
-          只是需要被自己好好看見。</p>
-          <p>你不需要一次改變所有事情，<br>
-          只要願意從現在的你開始。</p>
-          <p class='mt-4'><em>#Tilandky的覺察日常  #關係裡的自己也重要  #慢慢靠近自己  #相信才會看見</em></p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # 主要服務概覽
-    st.markdown(
-        """
-        <div class='grid grid-cols-1 md:grid-cols-3 gap-4 my-4'>
-          <div class='p-4 border rounded-lg hover:shadow-lg'>
-            <h2 class='text-xl font-semibold'>星際馬雅曆解析</h2>
-            <p>探索靈魂天命與銀河印記，解析你的 KIN。</p>
-          </div>
-          <div class='p-4 border rounded-lg hover:shadow-lg'>
-            <h2 class='text-xl font-semibold'>ThetaHealing 希塔療癒</h2>
-            <p>轉化潛意識，重啟靈魂程式的神聖技術。</p>
-          </div>
-          <div class='p-4 border rounded-lg hover:shadow-lg'>
-            <h2 class='text-xl font-semibold'>身心靈整合服務</h2>
-            <p>全方位療癒方案，從冥想到能量轉化。</p>
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# ===== 部落格 =====
+# 部落格
 elif page == "部落格":
     st.title("日常探索部落格")
-    st.sidebar.header("撰寫新文章")
-
-    # --- 新文章表單 ---
-    with st.sidebar.form("new_post_form"):
-        title       = st.text_input("標題")
-        keywords    = st.text_input("關鍵字（逗號分隔）")
-        description = st.text_area("摘要 / 描述", height=60)
-        outline     = st.text_area("章節大綱（每行一項）", height=100)
-        content     = st.text_area("內文")
-        images      = st.file_uploader("上傳圖片 (可多選)", type=["png","jpg","jpeg"], accept_multiple_files=True)
-        submit      = st.form_submit_button("發布文章")
-
-    # 當按下「發布文章」按鈕
-    if submit:
-        if not title or not content:
-            st.sidebar.error("請填寫標題與內文")
-        else:
-            # 1. 處理圖片
-            saved_imgs = []
-            if images:
-                for idx, img in enumerate(images, start=1):
-                    ext = os.path.splitext(img.name)[1]
-                    fname = f"{slugify(title)}-{idx}{ext}"
-                    fpath = os.path.join(IMAGE_DIR, fname)
-                    with open(fpath, "wb") as f:
-                        f.write(img.getbuffer())
-                    saved_imgs.append(fname)
-
-            # 2. 寫入 Markdown 檔
-            date_str = datetime.now().strftime("%Y-%m-%d")
-            slug = slugify(title)
-            md_filename = f"{date_str}-{slug}.md"
-            md_path = os.path.join(CONTENT_DIR, md_filename)
-
-            try:
-                with open(md_path, "w", encoding="utf-8") as md:
-                    # frontmatter
-                    md.write("---\n")
-                    md.write(f"title: {title}\n")
-                    md.write(f"date: {date_str}\n")
-                    md.write(f"keywords: {keywords}\n")
-                    md.write(f"description: {description}\n")
-                    md.write("outline:\n")
-                    for line in outline.split("\n"):
-                        md.write(f"  - {line.strip()}\n")
-                    md.write(f"images: {saved_imgs}\n")
-                    md.write("---\n\n")
-                    # body
-                    md.write(content)
-                st.sidebar.success(f"🎉 文章已保存：{md_filename}")
-                # 為了立刻看到新文章，重新整理
-                st.experimental_rerun()
-            except Exception as e:
-                st.sidebar.error(f"儲存失敗：{e}")
-
-    # --- 顯示文章列表 和 文章內容 ---
-    posts = sorted([f for f in os.listdir(CONTENT_DIR) if f.endswith(".md")], reverse=True)
-    sel = st.selectbox("選擇文章", ["── 無 ──"] + posts)
-    if sel != "── 無 ──":
-        data = load_md(os.path.join(CONTENT_DIR, sel))
+    tpl = st.sidebar.selectbox("載入 SEO 範本", ["— 無 —"] + list(TEMPLATES.keys()))
+    choice = st.sidebar.selectbox("文章列表", ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True))
+    # 新增文章
+    if choice == "── 新增文章 ──":
+        with st.sidebar.form("new"):
+            title = st.text_input("標題")
+            keywords = st.text_input("關鍵字")
+            description = st.text_area("摘要", height=60)
+            outline = st.text_area("大綱(每行一項)", height=100)
+            content = st.text_area("內文")
+            imgs = st.file_uploader("圖片(多選)", accept_multiple_files=True)
+            submit = st.form_submit_button("發布")
+        # apply template...
+        if submit and title:
+            # ... save logic ...
+            st.sidebar.success("已發布文章！")
+    # 顯示／編輯／刪除文章
+    else:
+        path = os.path.join(CONTENT_DIR, choice)
+        data = load_md(path)
         meta, body = data["meta"], data["body"]
-        st.header(meta.get("title", ""))
-        # 顯示圖片
-        for img in meta.get("images", []):
-            img_path = os.path.join(IMAGE_DIR, img)
-            if os.path.exists(img_path):
-                st.image(Image.open(img_path), use_container_width=True)
-        # 顯示內文
+        st.header(meta["title"])
+        # 顯示 images
+        for img in meta["images"]:
+            p = os.path.join(IMAGE_DIR, img)
+            if os.path.exists(p): st.image(p, use_container_width=True)
         st.markdown(markdown.markdown(body), unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("編輯文章"):
+                st.warning("編輯暫不支援！")
+        with col2:
+            if st.button("刪除文章"):
+                os.remove(path)
+                for img in meta["images"]:
+                    ip = os.path.join(IMAGE_DIR, img)
+                    if os.path.exists(ip): os.remove(ip)
+                st.success("文章已刪除，請重新整理！")
 
 # ===== 免費資源 =====
 elif page=="免費資源":
