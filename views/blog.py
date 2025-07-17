@@ -49,7 +49,7 @@ if submit and title and content:
     st.sidebar.success("文章已發布！請重新整理列表。")
 
 # 顯示現有文章
-st.title("日常探索部落格")
+st.title("Tilandky的覺察日常部落格")
 posts = sorted([f for f in os.listdir(CONTENT_DIR) if f.endswith('.md')], reverse=True)
 choice = st.selectbox("選擇文章", posts)
 if choice:
