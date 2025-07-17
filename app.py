@@ -1,3 +1,5 @@
+## app.py
+```python
 import streamlit as st
 from utils.loader import load_markdown
 from utils.mailchimp import subscribe_email
@@ -16,7 +18,7 @@ st.markdown(
 )
 
 # 側邊欄導覽：只保留部落格、免費資源、關於我、聯絡我
-st.sidebar.title("Tilandk的覺察日常")
+st.sidebar.title("Tilandky的覺察日常")
 page = st.sidebar.radio("導航", ["部落格", "免費資源", "關於我", "聯絡我"])
 
 # 路由選擇
