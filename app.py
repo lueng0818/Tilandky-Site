@@ -1,5 +1,4 @@
 import os, sys
-# 將當前專案根目錄加入到 Python 的模組搜尋路徑
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import streamlit as st
