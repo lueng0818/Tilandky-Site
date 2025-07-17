@@ -1,3 +1,5 @@
+## views/blog.py
+```python
 import streamlit as st
 import os
 from utils.loader import load_markdown
@@ -11,8 +13,8 @@ IMAGE_DIR = os.path.join("assets", "blog_images")
 os.makedirs(CONTENT_DIR, exist_ok=True)
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
+
 def slugify(text):
-    # 基本 slug 化
     text = text.lower()
     text = re.sub(r"[^a-z0-9\s-]", "", text)
     text = re.sub(r"[\s-]+", "-", text).strip('-')
@@ -27,7 +29,6 @@ with st.sidebar.form(key='new_post_form'):
     submit = st.form_submit_button("發布文章")
 
 if submit and title and content:
-    # 處理圖片
     image_filename = None
     if image_file:
         ext = os.path.splitext(image_file.name)[1]
@@ -35,7 +36,6 @@ if submit and title and content:
         img_path = os.path.join(IMAGE_DIR, image_filename)
         with open(img_path, 'wb') as f:
             f.write(image_file.getbuffer())
-    # 建立 markdown 檔
     date_str = datetime.now().strftime('%Y-%m-%d')
     slug = slugify(title)
     md_filename = f"{date_str}-{slug}.md"
