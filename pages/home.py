@@ -2,11 +2,7 @@ import streamlit as st
 from PIL import Image
 
 def show():
-    st.title("歡迎來到 Tilandky 日常探索")
-
-    # Banner
-    banner = Image.open("assets/banner.jpg")
-    st.image(banner, use_container_width=True)
+    st.title("歡迎來到 Tilandky的覺察日常")
 
     # Logo 與服務簡介
     cols = st.columns([1, 2])
