@@ -21,14 +21,14 @@ page = st.sidebar.radio("導航", ["部落格", "免費資源", "關於我", "�
 
 # 路由選擇
 if page == "部落格":
-    from pages.blog import show as show_blog
+    from views.blog import show as show_blog
     show_blog()
 elif page == "免費資源":
-    from pages.resources import show as show_resources
+    from views.resources import show as show_resources
     show_resources()
 elif page == "關於我":
-    from pages.about import show as show_about
+    from views.about import show as show_about
     show_about()
 elif page == "聯絡我":
-    from pages.contact import show as show_contact
+    from views.contact import show as show_contact
     show_contact()
