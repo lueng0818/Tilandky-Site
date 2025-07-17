@@ -1,5 +1,4 @@
 ## app.py
-```python
 import streamlit as st
 from utils.loader import load_markdown
 from utils.mailchimp import subscribe_email
