@@ -16,7 +16,7 @@ st.markdown(
 )
 
 # 側邊欄導覽：只保留部落格、免費資源、關於我、聯絡我
-st.sidebar.title("Tilandky 日常探索")
+st.sidebar.title("Tilandk的覺察日常")
 page = st.sidebar.radio("導航", ["部落格", "免費資源", "關於我", "聯絡我"])
 
 # 路由選擇
