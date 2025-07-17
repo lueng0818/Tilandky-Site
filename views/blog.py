@@ -2,7 +2,7 @@
 ```python
 import streamlit as st
 import os
-from utils.loader import load_markdown
+from loader import load_markdown
 from datetime import datetime
 import re
 
