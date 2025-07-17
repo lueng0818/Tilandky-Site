@@ -141,7 +141,6 @@ if page == "首頁":
         unsafe_allow_html=True,
     )
 
-# ===== 部落格 =====
 elif page == "部落格":
     st.title("日常探索部落格")
 
@@ -152,7 +151,7 @@ elif page == "部落格":
         ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True),
     )
 
-    # --- 新增文章 ---
+    # 新增文章
     if choice == "── 新增文章 ──":
         with st.sidebar.form("new_post_form"):
             title       = st.text_input("標題")
@@ -165,19 +164,16 @@ elif page == "部落格":
             )
             submit      = st.form_submit_button("發布文章")
 
-        # 套用範本到表單
         if tpl != "— 無 —" and submit:
             tmp = TEMPLATES[tpl]
             if not keywords:    keywords    = tmp["keywords"]
             if not description: description = tmp["description"]
             if not outline:     outline     = "\n".join(tmp["outline"])
 
-        # 發布邏輯
         if submit:
             if not title or not content:
                 st.sidebar.error("請填寫標題與內文")
             else:
-                # 儲存圖片
                 saved_imgs = []
                 for idx, img in enumerate(images or [], start=1):
                     ext = os.path.splitext(img.name)[1]
@@ -187,7 +183,6 @@ elif page == "部落格":
                         f.write(img.getbuffer())
                     saved_imgs.append(fname)
 
-                # 撰寫 Markdown 檔
                 date_str = datetime.now().strftime("%Y-%m-%d")
                 slug = slugify(title)
                 md_filename = f"{date_str}-{slug}.md"
@@ -208,34 +203,30 @@ elif page == "部落格":
                 st.sidebar.success(f"🎉 文章已保存：{md_filename}")
                 st.experimental_rerun()
 
-    # --- 顯示／刪除文章 ---
+    # 顯示／刪除文章
     else:
-        # 讀取文章
         path = os.path.join(CONTENT_DIR, choice)
         data = load_md(path)
         meta, body = data["meta"], data["body"]
 
-        # 標題
         st.header(meta.get("title", ""))
 
-import base64
-
-# ===== 部落格：Carousel 圖片顯示 =====
-images = meta.get("images", [])
-if images:
-    html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
-    for img in images:
-        img_path = os.path.join(IMAGE_DIR, img)
-        # 讀檔並轉 base64
-        with open(img_path, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
-        # 指定 data URI
-        html += (
-            f"<img src='data:image/png;base64,{b64}' "
-            "style='height:300px; flex-shrink:0; border-radius:8px; margin-right:8px;'/>"
-        )
-    html += "</div>"
-    st.markdown(html, unsafe_allow_html=True)
+        # Carousel 圖片
+        images = meta.get("images", [])
+        if images:
+            html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
+            for img in images:
+                img_path = os.path.join(IMAGE_DIR, img)
+                # 轉 base64 確保顯示
+                import base64
+                with open(img_path, "rb") as f:
+                    b64 = base64.b64encode(f.read()).decode()
+                html += (
+                    f"<img src='data:image/png;base64,{b64}' "
+                    "style='height:300px; flex-shrink:0; border-radius:8px; margin-right:8px;'/>"
+                )
+            html += "</div>"
+            st.markdown(html, unsafe_allow_html=True)
 
         # 文章內容
         st.markdown(markdown.markdown(body), unsafe_allow_html=True)
@@ -249,6 +240,7 @@ if images:
                     os.remove(ip)
             st.success("文章已刪除！請重新整理。")
             st.experimental_rerun()
+
 
 # ===== 免費資源 =====
 elif page=="免費資源":
