@@ -218,18 +218,24 @@ elif page == "部落格":
         # 標題
         st.header(meta.get("title", ""))
 
-        # 圖片橫向滑動（IG 風格 Carousel）
-        images = meta.get("images", [])
-        if images:
-            html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
-            for img in images:
-                img_path = os.path.join(IMAGE_DIR, img)
-                html += (
-                    f"<img src='{img_path}' "
-                    "style='height:300px; flex-shrink:0; border-radius:8px;'/>"
-                )
-            html += "</div>"
-            st.markdown(html, unsafe_allow_html=True)
+import base64
+
+# ===== 部落格：Carousel 圖片顯示 =====
+images = meta.get("images", [])
+if images:
+    html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
+    for img in images:
+        img_path = os.path.join(IMAGE_DIR, img)
+        # 讀檔並轉 base64
+        with open(img_path, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+        # 指定 data URI
+        html += (
+            f"<img src='data:image/png;base64,{b64}' "
+            "style='height:300px; flex-shrink:0; border-radius:8px; margin-right:8px;'/>"
+        )
+    html += "</div>"
+    st.markdown(html, unsafe_allow_html=True)
 
         # 文章內容
         st.markdown(markdown.markdown(body), unsafe_allow_html=True)
