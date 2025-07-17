@@ -97,10 +97,49 @@ st.markdown("<style>[data-testid='stSidebarNav'] > div:nth-child(2){display:none
 st.sidebar.title("Tilandky的覺察日常")
 page = st.sidebar.radio("導航", ["首頁", "部落格", "免費資源", "關於我", "聯絡我"])
 
-# 首頁
+# ===== 首頁 =====
 if page == "首頁":
+    # Banner
     st.image("assets/banner.jpg", use_container_width=True)
-    st.markdown("...首頁內容...", unsafe_allow_html=True)
+
+    # 主要介紹
+    st.markdown(
+        """
+        <div class='prose lg:prose-xl mx-auto my-4'>
+          <p>這裡是 <strong>Tilandky 的覺察日常</strong>。<br>
+          陪你一起練習在關係裡，不再把自己藏起來；<br>
+          在創業路上不再懷疑自己的價值。<br>
+          我相信每個人都有自己的節奏與方式，<br>
+          你不是不夠好，也不是走太慢，<br>
+          只是需要被自己好好看見。</p>
+          <p>你不需要一次改變所有事情，<br>
+          只要願意從現在的你開始。</p>
+          <p class='mt-2'><em>#Tilandky的覺察日常  #關係裡的自己也重要  #慢慢靠近自己  #相信才會看見</em></p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 三大服務概覽
+    st.markdown(
+        """
+        <div class='grid grid-cols-1 md:grid-cols-3 gap-4 my-4'>
+          <div class='p-4 border rounded-lg hover:shadow-lg'>
+            <h2 class='text-lg font-semibold'>星際馬雅曆解析</h2>
+            <p>探索靈魂天命與銀河印記，解析你的 KIN。</p>
+          </div>
+          <div class='p-4 border rounded-lg hover:shadow-lg'>
+            <h2 class='text-lg font-semibold'>ThetaHealing 希塔療癒</h2>
+            <p>轉化潛意識，重啟靈魂程式的神聖技術。</p>
+          </div>
+          <div class='p-4 border rounded-lg hover:shadow-lg'>
+            <h2 class='text-lg font-semibold'>身心靈整合服務</h2>
+            <p>全方位療癒方案，從冥想到能量轉化。</p>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ===== 部落格 =====
 elif page == "部落格":
