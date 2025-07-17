@@ -217,19 +217,23 @@ elif page == "部落格":
         # 標題
         st.header(meta.get("title", ""))
 
-        # Carousel 圖片顯示
+         # Carousel 圖片顯示（點擊可放大）
         images = meta.get("images", [])
         if images:
             import base64
             html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
             for img in images:
                 img_path = os.path.join(IMAGE_DIR, img)
+                # 讀檔並轉 base64
                 with open(img_path, "rb") as f:
                     b64 = base64.b64encode(f.read()).decode()
+                data_uri = f"data:image/png;base64,{b64}"
+                # 把 <img> 包在 <a> 裡，點擊就會在新分頁開啟原圖
                 html += (
-                    f"<img src='data:image/png;base64,{b64}' "
-                    "style='height:200px; width:auto; flex-shrink:0; "
-                    "border-radius:8px; margin-right:8px;'/>"
+                    f"<a href='{data_uri}' target='_blank' style='flex-shrink:0;'>"
+                    f"<img src='{data_uri}' "
+                    "style='height:200px; width:auto; border-radius:8px; margin-right:8px;'/>"
+                    "</a>"
                 )
             html += "</div>"
             st.markdown(html, unsafe_allow_html=True)
