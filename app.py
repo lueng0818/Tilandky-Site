@@ -5,7 +5,7 @@ from PIL import Image
 import os
 
 st.set_page_config(
-    page_title="Tilandky 日常探索",
+    page_title="Tilandky的覺察日常",
     layout="wide",
 )
 
