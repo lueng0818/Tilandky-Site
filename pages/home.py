@@ -5,19 +5,25 @@ def show():
     st.title("歡迎來到 Tilandky 日常探索")
     banner = Image.open("assets/banner.jpg")
     st.image(banner, use_column_width=True)
+
+    # 首頁自訂介紹
     st.markdown(
         """
-        <div class='prose prose-lg mx-auto'>
-          <p>在這裡，我們一起探索日常中的療癒力量。</p>
-          <ul>
-            <li>深度文章分享</li>
-            <li>學員見證</li>
-            <li>免費資源領取</li>
-          </ul>
+        <div class='prose prose-lg mx-auto my-8'>
+          <p>這裡是 <strong>Tilandky 的覺察日常</strong>。<br>
+          陪你一起練習在關係裡，不再把自己藏起來；<br>
+          在創業路上不再懷疑自己的價值。<br>
+          我相信每個人都有自己的節奏與方式，<br>
+          你不是不夠好，也不是走太慢，<br>
+          只是需要被自己好好看見。<br><br>
+          你不需要一次改變所有事情，<br>
+          只要願意從現在的你開始。</p>
+          <p>#Tilandky的覺察日常  #關係裡的自己也重要  #慢慢靠近自己  #相信才會看見</p>
         </div>
         """,
         unsafe_allow_html=True
     )
+
     # 社群連結
     st.markdown(
         """
