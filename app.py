@@ -127,10 +127,17 @@ elif page == "部落格":
         data = load_md(path)
         meta, body = data["meta"], data["body"]
         st.header(meta["title"])
-        # 顯示 images
-        for img in meta["images"]:
-            p = os.path.join(IMAGE_DIR, img)
-            if os.path.exists(p): st.image(p, use_container_width=True)
+# 圖片橫向滑動顯示（類似 IG Carousel）
+images = meta.get("images", [])
+if images:
+    # 建構一個可左右滑動的容器
+    html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
+    for img in images:
+        img_path = os.path.join(IMAGE_DIR, img)
+        # Streamlit 允許用相對路徑直接做 <img> 標籤
+        html += f"<img src='{img_path}' style='height:300px; flex-shrink:0; border-radius:8px;'/>"
+    html += "</div>"
+    st.markdown(html, unsafe_allow_html=True)
         st.markdown(markdown.markdown(body), unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
