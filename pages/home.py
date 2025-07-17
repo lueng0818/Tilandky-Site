@@ -5,11 +5,8 @@ def show():
     st.title("歡迎來到 Tilandky的覺察日常")
 
     # Logo 與服務簡介
-    cols = st.columns([1, 2])
+    cols = st.columns([0, 2])
     with cols[0]:
-        logo = Image.open("assets/logo.png")
-        st.image(logo, caption="Tilandky 馬雅之鏡", use_container_width=True)
-    with cols[1]:
         services = Image.open("assets/services.png")
         st.image(services, use_container_width=True)
 
