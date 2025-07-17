@@ -1,9 +1,6 @@
-import os, sys
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
 import streamlit as st
-from utils.loader import load_markdown
-from utils.mailchimp import subscribe_email
+from loader import load_markdown
+from mailchimp import subscribe_email
 from PIL import Image
 import os
 
