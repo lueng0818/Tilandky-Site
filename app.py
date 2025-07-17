@@ -141,23 +141,21 @@ if page == "首頁":
         unsafe_allow_html=True,
     )
 
-# 部落格
 elif page == "部落格":
     st.title("日常探索部落格")
-    # 讀取 URL 參數，優先開啟指定文章
-    params = st.experimental_get_query_params()
-    article_param = params.get("article", [None])[0]
 
-    # 側邊欄：SEO 範本
-    tpl = st.sidebar.selectbox("載入 SEO 範本", ["— 無 —"] + list(TEMPLATES.keys()))
-    # 側邊欄：文章選擇，若 URL 有參數直接使用，否則顯示下拉
-    if article_param:
-        choice = article_param
-    else:
-        choice = st.sidebar.selectbox(
-            "文章列表",
-            ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True),
-        )
+    # 為每個 selectbox 加上不同的 key
+    tpl = st.sidebar.selectbox(
+        "載入 SEO 範本",
+        ["— 無 —"] + list(TEMPLATES.keys()),
+        key="tpl_selectbox"
+    )
+    choice = st.sidebar.selectbox(
+        "文章列表",
+        ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True),
+        key="choice_selectbox"
+    )
+    
     st.title("日常探索部落格")
     tpl = st.sidebar.selectbox("載入 SEO 範本", ["— 無 —"] + list(TEMPLATES.keys()))
     choice = st.sidebar.selectbox("文章列表", ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True))
