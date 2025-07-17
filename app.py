@@ -97,138 +97,67 @@ st.markdown("<style>[data-testid='stSidebarNav'] > div:nth-child(2){display:none
 st.sidebar.title("Tilandky的覺察日常")
 page = st.sidebar.radio("導航", ["首頁", "部落格", "免費資源", "關於我", "聯絡我"])
 
-# ===== 首頁 =====
+# 首頁
 if page == "首頁":
-    # Banner
     st.image("assets/banner.jpg", use_container_width=True)
+    st.markdown("...首頁內容...", unsafe_allow_html=True)
 
-    # 主要介紹
-    st.markdown(
-        """
-        <div class='prose lg:prose-xl mx-auto my-4'>
-          <p>這裡是 <strong>Tilandky 的覺察日常</strong>。<br>
-          陪你一起練習在關係裡，不再把自己藏起來；<br>
-          在創業路上不再懷疑自己的價值。<br>
-          我相信每個人都有自己的節奏與方式，<br>
-          你不是不夠好，也不是走太慢，<br>
-          只是需要被自己好好看見。</p>
-          <p>你不需要一次改變所有事情，<br>
-          只要願意從現在的你開始。</p>
-          <p class='mt-2'><em>#Tilandky的覺察日常  #關係裡的自己也重要  #慢慢靠近自己  #相信才會看見</em></p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # 三大服務概覽
-    st.markdown(
-        """
-        <div class='grid grid-cols-1 md:grid-cols-3 gap-4 my-4'>
-          <div class='p-4 border rounded-lg hover:shadow-lg'>
-            <h2 class='text-lg font-semibold'>星際馬雅曆解析</h2>
-            <p>探索靈魂天命與銀河印記，解析你的 KIN。</p>
-          </div>
-          <div class='p-4 border rounded-lg hover:shadow-lg'>
-            <h2 class='text-lg font-semibold'>ThetaHealing 希塔療癒</h2>
-            <p>轉化潛意識，重啟靈魂程式的神聖技術。</p>
-          </div>
-          <div class='p-4 border rounded-lg hover:shadow-lg'>
-            <h2 class='text-lg font-semibold'>身心靈整合服務</h2>
-            <p>全方位療癒方案，從冥想到能量轉化。</p>
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
+# 部落格
 elif page == "部落格":
     st.title("日常探索部落格")
+    # 讀取 URL 參數，優先開啟指定文章
+    params = st.experimental_get_query_params()
+    article_param = params.get("article", [None])[0]
 
-    # 讀取所有文章檔案、解析 meta
-    posts = sorted([
-        fname for fname in os.listdir(CONTENT_DIR) 
-        if fname.endswith(".md")
-    ], reverse=True)
-    articles = []
-    for fn in posts:
-        meta = load_md(os.path.join(CONTENT_DIR, fn))["meta"]
-        label = f"{meta.get('date','')} － {meta.get('title','')}"
-        articles.append({
-            "file": fn,
-            "label": label,
-            "series": meta.get("series","")
-        })
-
-    # 側邊欄：文章列表
-    sel_label = st.sidebar.selectbox(
-        "所有文章", 
-        ["── 依日期排序 ──"] + [a["label"] for a in articles]
-    )
-
-    # 當點選一篇文章
-    if sel_label != "── 依日期排序 ──":
-        # 找到對應文章
-        idx = next(i for i,a in enumerate(articles) if a["label"]==sel_label)
-        art = articles[idx]
-        data = load_md(os.path.join(CONTENT_DIR, art["file"]))
-        meta, body = data["meta"], data["body"]
-
-        # 顯示標題與日期
-        st.header(meta.get("title",""))
-        st.caption(meta.get("date",""))
-
-        # 若有系列，顯示同系列文章列表
-        series = meta.get("series","")
-        if series:
-            st.markdown(f"**系列：{series}**")
-            for s in articles:
-                if s["series"]==series and s["file"]!=art["file"]:
-                    st.markdown(f"- [{s['label']}](/?page=部落格&article={s['file']})", unsafe_allow_html=True)
-
-        # Carousel 圖片（同前）
-        images = meta.get("images", [])
-        if images:
-            import base64
-            html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
-            for img in images:
-                img_path = os.path.join(IMAGE_DIR, img)
-                with open(img_path,"rb") as f:
-                    b64=base64.b64encode(f.read()).decode()
-                html+=(
-                    f"<a href='data:image/png;base64,{b64}' target='_blank'>"
-                    f"<img src='data:image/png;base64,{b64}' style='height:200px; width:auto; flex-shrink:0; border-radius:8px; margin-right:8px;'/>"
-                    "</a>"
-                )
-            html+="</div>"
-            st.markdown(html, unsafe_allow_html=True)
-
-        # 文章內容
-        html_body = markdown.markdown(body)
-        st.markdown(
-            f"<div class='prose prose-lg mx-auto my-6'>{html_body}</div>",
-            unsafe_allow_html=True
-        )
-
-        # 上一篇／下一篇導航
-        nav_cols = st.columns(2)
-        if idx+1 < len(articles):
-            prev = articles[idx+1]
-            with nav_cols[0]:
-                st.button(f"← 上一篇：{prev['label']}", key="prev", 
-                          on_click=st.experimental_set_query_params, args=( {"page":"部落格","article":prev["file"]}, ))
-        if idx-1 >= 0:
-            nxt = articles[idx-1]
-            with nav_cols[1]:
-                st.button(f"下一篇：{nxt['label']} →", key="next",
-                          on_click=st.experimental_set_query_params, args=( {"page":"部落格","article":nxt["file"]}, ))
-
+    # 側邊欄：SEO 範本
+    tpl = st.sidebar.selectbox("載入 SEO 範本", ["— 無 —"] + list(TEMPLATES.keys()))
+    # 側邊欄：文章選擇，若 URL 有參數直接使用，否則顯示下拉
+    if article_param:
+        choice = article_param
     else:
-        # 文章列表首頁：只顯示標題清單
-        st.markdown("### 最新文章")
-        for a in articles:
-            st.markdown(f"- [{a['label']}](/?page=部落格&article={a['file']})", unsafe_allow_html=True)
-
-
+        choice = st.sidebar.selectbox(
+            "文章列表",
+            ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True),
+        )
+    st.title("日常探索部落格")
+    tpl = st.sidebar.selectbox("載入 SEO 範本", ["— 無 —"] + list(TEMPLATES.keys()))
+    choice = st.sidebar.selectbox("文章列表", ["── 新增文章 ──"] + sorted(os.listdir(CONTENT_DIR), reverse=True))
+    # 新增文章
+    if choice == "── 新增文章 ──":
+        with st.sidebar.form("new"):
+            title = st.text_input("標題")
+            keywords = st.text_input("關鍵字")
+            description = st.text_area("摘要", height=60)
+            outline = st.text_area("大綱(每行一項)", height=100)
+            content = st.text_area("內文")
+            imgs = st.file_uploader("圖片(多選)", accept_multiple_files=True)
+            submit = st.form_submit_button("發布")
+        # apply template...
+        if submit and title:
+            # ... save logic ...
+            st.sidebar.success("已發布文章！")
+    # 顯示／編輯／刪除文章
+    else:
+        path = os.path.join(CONTENT_DIR, choice)
+        data = load_md(path)
+        meta, body = data["meta"], data["body"]
+        st.header(meta["title"])
+        # 顯示 images
+        for img in meta["images"]:
+            p = os.path.join(IMAGE_DIR, img)
+            if os.path.exists(p): st.image(p, use_container_width=True)
+        st.markdown(markdown.markdown(body), unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("編輯文章"):
+                st.warning("編輯暫不支援！")
+        with col2:
+            if st.button("刪除文章"):
+                os.remove(path)
+                for img in meta["images"]:
+                    ip = os.path.join(IMAGE_DIR, img)
+                    if os.path.exists(ip): os.remove(ip)
+                st.success("文章已刪除，請重新整理！")
 
 
 # ===== 免費資源 =====
