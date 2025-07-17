@@ -160,39 +160,29 @@ elif page == "部落格":
         if submit and title:
             # ... save logic ...
             st.sidebar.success("已發布文章！")
-    # 顯示／編輯／刪除文章
-    else:
-        path = os.path.join(CONTENT_DIR, choice)
-        data = load_md(path)
-        meta, body = data["meta"], data["body"]
-        st.header(meta["title"])
-        import base64
-
-images = meta.get("images", [])
-if images:
-    html = "<div style='display:flex; gap:8px; overflow-x:auto; padding:8px 0;'>"
-    for img in images:
-        img_path = os.path.join(IMAGE_DIR, img)
-        with open(img_path, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
-        html += (
-            f"<img src='data:image/png;base64,{b64}' "
-            "style='height:200px; width:auto; flex-shrink:0; border-radius:8px; margin-right:8px;'/>"
-        )
-    html += "</div>"
+  # 顯示文章內容
     st.markdown(html, unsafe_allow_html=True)
-    
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("編輯文章"):
-                st.warning("編輯暫不支援！")
-        with col2:
-            if st.button("刪除文章"):
-                os.remove(path)
-                for img in meta["images"]:
-                    ip = os.path.join(IMAGE_DIR, img)
-                    if os.path.exists(ip): os.remove(ip)
-                st.success("文章已刪除，請重新整理！")
+
+    # 文章正⽂
+    st.markdown(
+        markdown.markdown(body),
+        unsafe_allow_html=True
+    )
+
+    # 刪除按鈕
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✏️ 編輯文章"):
+            st.warning("編輯暫不支援！")
+    with col2:
+        if st.button("🗑️ 刪除文章"):
+            os.remove(path)
+            for img in images:
+                ip = os.path.join(IMAGE_DIR, img)
+                if os.path.exists(ip):
+                    os.remove(ip)
+            st.success("文章已刪除，請重新整理！")
+            st.experimental_rerun()
 
 
 # ===== 免費資源 =====
