@@ -1,7 +1,7 @@
 ## views/contact.py
 ```python
 import streamlit as st
-from utils.email_sender import send_email
+from email_sender import send_email
 
 
 def show():
