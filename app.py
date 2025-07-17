@@ -62,7 +62,7 @@ elif page == "關於我":
         "<p><strong>Tilandky的覺察日常</strong></p>"
         "<p><a href='https://www.facebook.com/soulclean1413' target='_blank'>facebook.com/soulclean1413</a></p>"
         "</div>",
-        unsafe_allow_html=True
-    )elif page == "聯絡我":
+        unsafe_allow_html=True)
+elif page == "聯絡我":
     from views.contact import show as show_contact
     show_contact()
