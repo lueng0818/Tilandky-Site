@@ -1,3 +1,5 @@
+## utils/mailchimp.py
+```python
 import os
 from mailchimp_marketing import Client
 from mailchimp_marketing.api_client import ApiClientError
