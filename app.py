@@ -1,3 +1,5 @@
+## app.py
+```python
 import streamlit as st
 from utils.loader import load_markdown
 from utils.mailchimp import subscribe_email
@@ -5,7 +7,7 @@ from PIL import Image
 import os
 
 st.set_page_config(
-    page_title="Tilandky的覺察日常",
+    page_title="Tilandky 日常探索",
     layout="wide",
 )
 
